@@ -15,7 +15,7 @@ Ask question -> embed question (Gemini) -> similarity search (pgvector)
 ## Stack
 
 - **FastAPI** — REST API framework
-- **Google Gemini API** — embeddings (`text-embedding-004`) + generation (`gemini-1.5-flash`)
+- **Google Gemini API** — embeddings (`gemini-embedding-001`) + generation (`gemini-3.6-flash`)
 - **PostgreSQL + pgvector** — stores chunk text and embeddings, does similarity search in SQL
 - **Docker Compose** — runs the API and database together with one command
 - **LangChain's text splitter** — chunks documents intelligently

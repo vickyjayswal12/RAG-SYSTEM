@@ -16,6 +16,7 @@ so similarity search is just a SQL ORDER BY.
 import psycopg2
 import psycopg2.extras
 from pgvector.psycopg2 import register_vector
+from pgvector.psycopg2.vector import Vector
 
 from app.config import (
     POSTGRES_HOST,
@@ -27,7 +28,7 @@ from app.config import (
 )
 
 
-def get_connection():
+def get_connection(register_pgvector=True):
     """
     Opens a new connection and registers the pgvector type adapter so
     Python lists/np.arrays can be inserted directly into `vector` columns.
@@ -39,7 +40,8 @@ def get_connection():
         user=POSTGRES_USER,
         password=POSTGRES_PASSWORD,
     )
-    register_vector(conn)
+    if register_pgvector:
+        register_vector(conn)
     return conn
 
 
@@ -55,9 +57,10 @@ def init_db():
     - content: the raw chunk text (needed to build the LLM prompt later)
     - embedding: the vector representation used for similarity search
     """
-    conn = get_connection()
+    conn = get_connection(register_pgvector=False)
     cur = conn.cursor()
     cur.execute("CREATE EXTENSION IF NOT EXISTS vector;")
+    register_vector(conn)
     cur.execute(
         f"""
         CREATE TABLE IF NOT EXISTS documents (
@@ -125,14 +128,15 @@ def similarity_search(query_embedding, top_k=4):
     """
     conn = get_connection()
     cur = conn.cursor()
+    query_vector = Vector(query_embedding).to_text()
     cur.execute(
         """
-        SELECT source, chunk_index, content, embedding <=> %s AS distance
+        SELECT source, chunk_index, content, embedding <=> %s::vector AS distance
         FROM documents
-        ORDER BY embedding <=> %s
+        ORDER BY embedding <=> %s::vector
         LIMIT %s;
         """,
-        (query_embedding, query_embedding, top_k),
+        (query_vector, query_vector, top_k),
     )
     results = cur.fetchall()
     cur.close()

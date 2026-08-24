@@ -30,6 +30,7 @@ def embed_text(text: str, task_type: str = "retrieval_document"):
         model=EMBEDDING_MODEL,
         content=text,
         task_type=task_type,
+        output_dimensionality=768,
     )
     return result["embedding"]
 

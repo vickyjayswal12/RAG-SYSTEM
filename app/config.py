@@ -26,10 +26,10 @@ POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "ragpassword")
 CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", "800"))
 CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", "120"))
 
-EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "models/text-embedding-004")
-GENERATION_MODEL = os.getenv("GENERATION_MODEL", "models/gemini-1.5-flash")
+EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "models/gemini-embedding-001")
+GENERATION_MODEL = os.getenv("GENERATION_MODEL", "models/gemini-3.6-flash")
 
-# text-embedding-004 outputs 768-dimension vectors.
+# gemini-embedding-001 supports reducing its output to 768 dimensions.
 # This has to match the column size of the `embedding` column in Postgres
 # (see db.py) or inserts will fail.
 EMBEDDING_DIM = 768
